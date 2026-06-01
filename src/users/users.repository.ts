@@ -19,7 +19,7 @@ export class UsersRepository {
   }
 
   findByEmail(email: string) {
-    return this.userModel.findOne({ email });
+    return this.userModel.findOne({ email }).select('+password');
   }
 
   findAll() {

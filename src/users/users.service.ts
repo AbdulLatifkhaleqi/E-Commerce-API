@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from './dtos/create-user.dto';
 
@@ -12,15 +11,15 @@ import { CreateUserDto } from './dtos/create-user.dto';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async createUser(dto: CreateUserDto) {
-    const existingUser = await this.usersRepository.findByEmail(dto.email);
+  // async createUser(dto: CreateUserDto) {
+  //   const existingUser = await this.usersRepository.findByEmail(dto.email);
 
-    if (existingUser) {
-      throw new ConflictException('Email already exists');
-    }
+  //   if (existingUser) {
+  //     throw new ConflictException('Email already exists');
+  //   }
 
-    return this.usersRepository.create(dto);
-  }
+  //   return this.usersRepository.create(dto);
+  // }
 
   async getAllUsers() {
     return this.usersRepository.findAll();
@@ -36,15 +35,15 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: string, dto: UpdateUserDto) {
-    const user = await this.usersRepository.update(id, dto);
+  // async updateUser(id: string, dto: UpdateUserDto) {
+  //   const user = await this.usersRepository.update(id, dto);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
 
-    return user;
-  }
+  //   return user;
+  // }
 
   async deleteUser(id: string) {
     const user = await this.usersRepository.delete(id);
