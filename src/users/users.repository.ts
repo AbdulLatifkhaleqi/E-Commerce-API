@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './users.schema';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -26,7 +27,7 @@ export class UsersRepository {
     return this.userModel.find();
   }
 
-  update(id: string, payload: Partial<User>) {
+  update(id: string, payload: UpdateUserDto) {
     return this.userModel.findByIdAndUpdate(id, payload, {
       new: true,
     });
