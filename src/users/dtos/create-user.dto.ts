@@ -8,9 +8,10 @@ import {
   ValidateNested,
   IsBoolean,
 } from 'class-validator';
-import { UserRole } from '../users.schema';
+
 import { AvatarDto } from './avatar.dot';
 import { Type } from 'class-transformer';
+import { UserRole } from '../enums/user.role.enum';
 
 export class CreateUserDto {
   @IsString()
