@@ -6,7 +6,6 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { envValidationSchema } from './config/env.validation';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -22,7 +21,6 @@ import { CommonModule } from './common/common.module';
         uri: configService.getOrThrow<string>('DATABASE_URL'),
       }),
     }),
-    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

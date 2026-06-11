@@ -10,12 +10,23 @@ import {
 
 // import { UpdateUserDto } from '../dto/update-user.dto';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { RegisterDto } from 'src/auth/dtos/register.dto';
+import { LoginDto } from 'src/auth/dtos/login.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Post('register')
+  register(@Body() dto: RegisterDto) {
+    return this.usersService.register(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    return this.usersService.login(dto);
+  }
 
   @Get()
   getAllUsers() {

@@ -1,20 +1,25 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { UsersRepository } from 'src/users/users.repository';
-import { PasswordService } from 'src/common/services/password.service';
 import { LoginDto } from './dtos/login.dto';
-import { AuthTokenService } from 'src/common/services/auth-token.service';
+import { PasswordProvider } from './providers/password.provider';
+import jwtConfig from './config/jwt.config';
+import type { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userRepository: UsersRepository,
-    private readonly passwordService: PasswordService,
-    private readonly authTokenService: AuthTokenService,
+    private readonly passwordProvider: PasswordProvider,
+    private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   ///////////////////////////////////////////////////////////////////////////
@@ -27,17 +32,25 @@ export class AuthService {
       throw new ConflictException('Email already exists');
     }
 
-    const hashedPassword = await this.passwordService.hash(payload.password);
+    const hashedPassword = await this.passwordProvider.hash(payload.password);
 
     const user = await this.userRepository.create({
       ...payload,
       password: hashedPassword,
     });
 
-    const accessToken = await this.authTokenService.generateAccessToken({
-      sub: user._id.toString(),
-      email: user.email,
-    });
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user._id,
+        email: user.email,
+      },
+      {
+        issuer: this.jwtConfiguration.issuer,
+        audience: this.jwtConfiguration.audience,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
 
     return {
       message: 'Registration successful',
@@ -60,7 +73,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await this.passwordService.verify(
+    const isPasswordValid = await this.passwordProvider.verify(
       user.password,
       payload.password,
     );
@@ -69,11 +82,18 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const accessToken = await this.authTokenService.generateAccessToken({
-      sub: user._id.toString(),
-      email: user.email,
-    });
-
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user._id,
+        email: user.email,
+      },
+      {
+        issuer: this.jwtConfiguration.issuer,
+        audience: this.jwtConfiguration.audience,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
     return {
       message: 'Login successful',
       accessToken,
